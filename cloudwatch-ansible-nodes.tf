@@ -1,23 +1,23 @@
 ## Topic definition for alerting.
 # If multiple resources exist for each server group, count needs to be updated to the value of the var that defines the number of instances
-resource "aws_sns_topic" "critical_alerts" {
+resource "aws_sns_topic" "critical_alerts_node" {
   name = "${var.environment}-critical-alerts"
 
   provisioner "local-exec" {
     command = <<EOT
-    for email in ${var.critical_alerts_notification}; do
+    for email in ${var.critical_alerts_node_notification}; do
        aws sns subscribe --topic-arn ${self.arn} --protocol email --notification-endpoint $email;
     done
     EOT
   }
 }
 
-resource "aws_sns_topic" "non_critical_alerts" {
+resource "aws_sns_topic" "non_critical_alerts_node" {
   name = "${var.environment}-non-critical-alerts"
 
   provisioner "local-exec" {
     command = <<EOT
-    for email in ${var.critical_alerts_notification}
+    for email in ${var.critical_alerts_node_notification}
     do
        aws sns subscribe --topic-arn ${self.arn} --protocol email --notification-endpoint $email;
     done
@@ -38,9 +38,9 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization_check" {
   threshold           = "80"
   alarm_description   = "This metric monitors the cpu utilization"
   actions_enabled     = true
-  alarm_actions       = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  alarm_actions       = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
   alarm_description   = "${var.environment}.ansible_client_node id: ${element(aws_instance.ansible_client_node.*.id, count.index)} cpu utilization is high"
-  ok_actions          = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  ok_actions          = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
 
   dimensions {
     InstanceId = "${element(aws_instance.ansible_client_node.*.id, count.index)}"
@@ -60,9 +60,9 @@ resource "aws_cloudwatch_metric_alarm" "disk_space_utilization_ansible_client_no
   threshold           = "80"
   alarm_description   = "This metric checks disk space utilization"
   actions_enabled     = true
-  alarm_actions       = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  alarm_actions       = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
   alarm_description   = "${var.environment}.ansible_client_node id: ${element(aws_instance.ansible_client_node.*.id, count.index)} low disk space on instance"
-  ok_actions          = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  ok_actions          = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
 
   #  dimensions {InstanceId = "${element(aws_instance.ansible_client_node.*.id, count.index)}" }
   dimensions {
@@ -85,9 +85,9 @@ resource "aws_cloudwatch_metric_alarm" "status_check_failed_system" {
   threshold           = "1"
   alarm_description   = "This metric monitors StatusCheckFailed_System"
   actions_enabled     = true
-  alarm_actions       = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  alarm_actions       = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
   alarm_description   = "${var.environment}.ansible_client_node id: ${element(aws_instance.ansible_client_node.*.id, count.index)} has check failed system"
-  ok_actions          = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  ok_actions          = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
 
   dimensions {
     InstanceId = "${element(aws_instance.ansible_client_node.*.id, count.index)}"
@@ -107,9 +107,9 @@ resource "aws_cloudwatch_metric_alarm" "status_check_failed_instance" {
   threshold           = "1"
   alarm_description   = "This metric monitors StatusCheckFailed_Instance"
   actions_enabled     = true
-  alarm_actions       = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  alarm_actions       = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
   alarm_description   = "${var.environment}.ansible_client_node id: ${element(aws_instance.ansible_client_node.*.id, count.index)} has check failed instance"
-  ok_actions          = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  ok_actions          = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
 
   dimensions {
     InstanceId = "${element(aws_instance.ansible_client_node.*.id, count.index)}"
@@ -129,9 +129,9 @@ resource "aws_cloudwatch_metric_alarm" "memory_utilization_ansible_client_node" 
   threshold           = "40"
   alarm_description   = "This metric monitors MemoryUtilization"
   actions_enabled     = true
-  alarm_actions       = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  alarm_actions       = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
   alarm_description   = "${var.environment}.ansible_client_node id: ${element(aws_instance.ansible_client_node.*.id, count.index)} has high memory usage"
-  ok_actions          = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  ok_actions          = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
 
   dimensions {
     InstanceId = "${element(aws_instance.ansible_client_node.*.id, count.index)}"
@@ -151,9 +151,9 @@ resource "aws_cloudwatch_metric_alarm" "swap_utilization_ansible_client_node" {
   threshold           = "40"
   alarm_description   = "This metric monitors SwapUtilization"
   actions_enabled     = true
-  alarm_actions       = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  alarm_actions       = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
   alarm_description   = "${var.environment}.ansible_client_node id: ${element(aws_instance.ansible_client_node.*.id, count.index)} has high swap usage"
-  ok_actions          = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  ok_actions          = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
 
   dimensions {
     InstanceId = "${element(aws_instance.ansible_client_node.*.id, count.index)}"
@@ -173,9 +173,9 @@ resource "aws_cloudwatch_metric_alarm" "memory_available_ansible_client_node" {
   threshold           = "400"
   alarm_description   = "This metric monitors MemoryAvailable"
   actions_enabled     = true
-  alarm_actions       = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  alarm_actions       = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
   alarm_description   = "${var.environment}.ansible_client_node id: ${element(aws_instance.ansible_client_node.*.id, count.index)} has available memory"
-  ok_actions          = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  ok_actions          = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
 
   dimensions {
     InstanceId = "${element(aws_instance.ansible_client_node.*.id, count.index)}"
@@ -195,9 +195,9 @@ resource "aws_cloudwatch_metric_alarm" "memory_used_ansible_client_node" {
   threshold           = "3500"
   alarm_description   = "This metric monitors MemoryUsed"
   actions_enabled     = true
-  alarm_actions       = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  alarm_actions       = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
   alarm_description   = "${var.environment}.ansible_client_node id: ${element(aws_instance.ansible_client_node.*.id, count.index)} has used memory"
-  ok_actions          = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  ok_actions          = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
 
   dimensions {
     InstanceId = "${element(aws_instance.ansible_client_node.*.id, count.index)}"
@@ -217,9 +217,9 @@ resource "aws_cloudwatch_metric_alarm" "swap_used_ansible_client_node" {
   threshold           = "2500"
   alarm_description   = "This metric monitors SwapUsed"
   actions_enabled     = true
-  alarm_actions       = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  alarm_actions       = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
   alarm_description   = "${var.environment}.ansible_client_node id: ${element(aws_instance.ansible_client_node.*.id, count.index)} has swap used"
-  ok_actions          = ["${aws_sns_topic.non_critical_alerts.arn}"]
+  ok_actions          = ["${aws_sns_topic.non_critical_alerts_node.arn}"]
 
   dimensions {
     InstanceId = "${element(aws_instance.ansible_client_node.*.id, count.index)}"
