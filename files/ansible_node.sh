@@ -1,15 +1,17 @@
 #!/bin/bash
 yum-config-manager --enable epel
-yum -y update 
+yum -y update
 sudo -u ec2-user pip install --upgrade --user awscli
-yum -y install git screen httpd tmux awslogs perl-Switch perl-DateTime perl-Sys-Syslog perl-LWP-Protocol-https irssi
+yum -y install git screen httpd tmux awslogs perl-Switch perl-DateTime perl-Sys-Syslog perl-LWP-Protocol-https irssi perl-Digest-SHA
 hostname informatux-test.local
 curl -o /opt/CloudWatchMonitoringScripts-1.2.1.zip http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.1.zip -O
 unzip /opt/CloudWatchMonitoringScripts-1.2.1.zip -d /opt/
 cd /opt/aws-scripts-mon
 echo "*/1 * * * * ec2-user /opt/aws-scripts-mon/mon-put-instance-data.pl --swap-util --swap-used --mem-util --mem-avail --mem-used --disk-space-used --disk-space-util --disk-path=/ --from-cron" >> /etc/crontab
-/etc/init.d/awslogs restart
-chkconfig --level 345 awslogs on
+#/etc/init.d/awslogs restart
+systemctl restart awslogsd.service
+systemctl enable awslogsd.service
+#chkconfig --level 345 awslogs on
 echo "#
 # ------------------------------------------
 # CLOUDWATCH LOGS AGENT CONFIGURATION FILE
@@ -152,4 +154,9 @@ buffer_duration = 5000
 log_stream_name = {instance_id}
 initial_position = start_of_file
 log_group_name = /var/log/httpd/access_log " > /etc/awslogs/awslogs.conf
-/etc/init.d/awslogs restart 
+#/etc/init.d/awslogs restart
+systemctl restart httpd.service
+systemctl enable httpd.service
+systemctl restart awslogsd.service
+systemctl restart crond.service
+systemctl enable crond.service
