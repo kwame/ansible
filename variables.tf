@@ -1,5 +1,5 @@
 variable "cluster_name" {
-  default = "ec2-cloudwatch-test"
+  default = "ansible-terraform"
 }
 
 variable "region" {
