@@ -1,5 +1,7 @@
 #!/bin/bash
+yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 yum-config-manager --enable epel
+yum -y install ansible
 yum -y update
 sudo -u ec2-user pip install --upgrade --user awscli
 yum -y install git screen httpd tmux awslogs perl-Switch perl-DateTime perl-Sys-Syslog perl-LWP-Protocol-https irssi perl-Digest-SHA
