@@ -4,7 +4,7 @@ resource "aws_instance" "ansible_master_node" {
   key_name                    = "${var.ssh_key_name}"
   vpc_security_group_ids      = ["${aws_security_group.ansible_master_node.id}"]
   subnet_id                   = "${module.vpc.public_subnets[0]}"
-  user_data                   = "${file("files/ansible_node.sh")}"
+  user_data                   = "${file("files/ansible_master.sh")}"
   iam_instance_profile        = "${aws_iam_instance_profile.ansible_node-profile.id}"
   associate_public_ip_address = true
   source_dest_check           = false
