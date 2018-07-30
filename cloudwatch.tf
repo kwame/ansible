@@ -28,7 +28,7 @@ resource "aws_sns_topic" "non_critical_alerts" {
 # 1- Alert for CPU Utilization
 resource "aws_cloudwatch_metric_alarm" "cpu_utilization_check" {
   count               = 1
-  alarm_name          = "${var.environment}.ec2-cloudwatch-test.${element(aws_instance.ansible_master_node.*.id, count.index)}.cpu-utilization-check"
+  alarm_name          = "${var.environment}.ansible_master_node.${element(aws_instance.ansible_master_node.*.id, count.index)}.cpu-utilization-check"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "5"
   metric_name         = "CPUUtilization"

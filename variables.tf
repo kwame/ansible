@@ -49,7 +49,7 @@ variable enable_nat_gateway {
 }
 
 variable "environment" {
-  default = "cloudwatch-test"
+  default = "ansible-deployment"
 }
 
 variable "ansible_node_instance_size" {

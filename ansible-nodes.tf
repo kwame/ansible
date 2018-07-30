@@ -1,8 +1,8 @@
-resource "aws_instance" "ansible_master_node" {
+resource "aws_instance" "ansible_client_node" {
   ami                         = "${var.ansible_node_ami}"
   instance_type               = "${var.ansible_node_instance_size}"
   key_name                    = "${var.ssh_key_name}"
-  vpc_security_group_ids      = ["${aws_security_group.ansible_master_node.id}"]
+  vpc_security_group_ids      = ["${aws_security_group.ansible_client_node.id}"]
   subnet_id                   = "${module.vpc.public_subnets[0]}"
   user_data                   = "${file("files/ansible_node.sh")}"
   iam_instance_profile        = "${aws_iam_instance_profile.ansible_node-profile.id}"
@@ -14,21 +14,21 @@ resource "aws_instance" "ansible_master_node" {
   #}
 
   tags {
-    Name          = "Ansible master"
+    Name          = "Ansible node"
     "Terraform"   = "true"
     "Environment" = "${var.environment}"
   }
 }
 
-resource "aws_security_group" "ansible_master_node" {
-  name   = "${var.cluster_name}-ansible_master-SG"
+resource "aws_security_group" "ansible_client_node" {
+  name   = "${var.cluster_name}-ansible_node-SG"
   vpc_id = "${module.vpc.vpc_id}"
 
   tags = {
     "Terraform"   = "true"
     "Role"        = "Ops Utility security group"
     "Environment" = "${var.cluster_name}"
-    "Name"        = "${var.cluster_name}-ansible_node-test-SG"
+    "Name"        = "${var.cluster_name}-ansible_node-SG"
   }
 
   lifecycle {
@@ -36,9 +36,9 @@ resource "aws_security_group" "ansible_master_node" {
   }
 }
 
-resource "aws_security_group_rule" "allow_server_ansible_node_inbound" {
+resource "aws_security_group_rule" "allow_server_ansible_node_inbound-1" {
   type              = "ingress"
-  security_group_id = "${aws_security_group.ansible_master_node.id}"
+  security_group_id = "${aws_security_group.ansible_client_node.id}"
 
   from_port   = 22
   to_port     = 22
@@ -46,9 +46,9 @@ resource "aws_security_group_rule" "allow_server_ansible_node_inbound" {
   cidr_blocks = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group_rule" "allow_server_ansible_node_outbound" {
+resource "aws_security_group_rule" "allow_server_ansible_node_outbound-1" {
   type              = "egress"
-  security_group_id = "${aws_security_group.ansible_master_node.id}"
+  security_group_id = "${aws_security_group.ansible_client_node.id}"
 
   from_port   = 0
   to_port     = 0
